@@ -29,7 +29,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   size?: ButtonSize;
   isLoading?: boolean;
   fullWidth?: boolean;
-  asChild?: boolean; // Support asChild prop for composition
   children: React.ReactNode;
 }
 
@@ -49,33 +48,26 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  *   Loading...
  * </Button>
  * ```
- *
- * @example with asChild
- * ```tsx
- * <Button asChild>
- *   <Link href="/some-page">Navigate</Link>
- * </Button>
- * ```
  */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', isLoading = false, fullWidth = false, asChild = false, children, className, disabled, ...props }, ref) => {
+  ({ variant = 'primary', size = 'md', isLoading = false, fullWidth = false, children, className, disabled, ...props }, ref) => {
     /**
      * Variant-specific classes from design-system.md
      * T016: Button variants (primary, secondary, ghost, danger)
      */
     const variantClasses: Record<ButtonVariant, string> = {
-      // Primary variant - indigo with hover lift
+      // Primary variant - dark olive green mix with hover lift
       primary:
-        'bg-primary text-white shadow-md hover:shadow-lg hover:bg-primary-hover active:bg-indigo-800 disabled:bg-slate-300 disabled:text-slate-500',
-      // Secondary variant - white surface with border
+        'bg-gradient-to-r from-green-700 to-green-900 text-white shadow-md hover:shadow-lg hover:from-green-600 hover:to-green-800 active:from-green-800 active:to-green-950 disabled:bg-slate-300 disabled:text-slate-500',
+      // Secondary variant - white surface with olive green border and hover effect
       secondary:
-        'bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 hover:border-slate-300 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50 dark:hover:bg-slate-700',
-      // Ghost variant - transparent with hover background
+        'bg-white border border-green-200 text-green-900 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:border-green-300 dark:bg-green-900/20 dark:border-green-700 dark:text-green-50 dark:hover:from-green-900/30 dark:hover:to-green-800/30',
+      // Ghost variant - transparent with olive green hover background
       ghost:
-        'bg-transparent text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-      // Danger variant - rose for destructive actions
+        'bg-transparent text-green-700 hover:bg-gradient-to-r hover:from-green-100 hover:to-green-200 dark:text-green-300 dark:hover:from-green-800/50 dark:hover:to-green-700/50',
+      // Danger variant - rose for destructive actions with olive green hover
       danger:
-        'bg-rose-500 text-white shadow-md hover:bg-rose-600 hover:shadow-lg active:bg-rose-700',
+        'bg-rose-500 text-white shadow-md hover:bg-rose-600 hover:shadow-lg hover:from-green-600 hover:to-green-800 active:bg-rose-700',
     };
 
     /**
@@ -126,8 +118,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:ring-offset-2',
       // T019: Hover micro-lift animation
       'hover:-translate-y-0.5 transition-all duration-300 ease-out-cubic',
-      // Neon accent for primary buttons
-      variant === 'primary' ? 'neon' : '',
+      // Olive green theme for primary buttons
+      variant === 'primary' ? 'olive-green-theme' : '',
+      // White bright effect on button sides
+      'btn-white-bright-effect',
       // Disabled state
       'disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0',
       // Full width option
@@ -136,26 +130,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       sizeClasses[size],
       className
     );
-
-    // If asChild is true, clone the child element and apply button properties to it
-    if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(
-        children,
-        {
-          ref,
-          className: cn(baseClasses, children.props.className),
-          disabled: disabled || isLoading,
-          'aria-busy': isLoading,
-          ...props
-        } as React.ButtonHTMLAttributes<HTMLElement>,
-        isLoading ? (
-          <span className="flex items-center gap-2">
-            {loadingSpinner}
-            <span>Loading...</span>
-          </span>
-        ) : children.props.children
-      );
-    }
 
     return (
       <button

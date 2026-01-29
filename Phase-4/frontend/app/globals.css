@@ -338,6 +338,14 @@
     @apply text-base text-muted-foreground leading-relaxed;
   }
 
+  .small {
+    @apply text-sm text-muted-foreground leading-normal;
+  }
+
+  .tiny {
+    @apply text-xs text-muted-foreground leading-tight;
+  }
+
   .caption {
     @apply text-sm text-muted-foreground;
   }

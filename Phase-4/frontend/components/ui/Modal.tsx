@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
  * T024-T027: Modal Component
  * Flagship UI modal with backdrop blur, glassmorphism, and entrance animation
  *
- * Integrates with CSS design system from phase3-design-system.css
+ * Zero third-party libraries - uses only Tailwind CSS utilities and native CSS transitions
  */
 
 /**
@@ -97,41 +97,61 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       xl: 'max-w-xl',
     };
 
-    // Determine animation classes based on state
-    const overlayAnimationClass = isAnimatingOut
-      ? 'animate-[fadeOut_200ms_ease-in]'
-      : 'animate-[fadeIn_200ms_ease-out]';
+    /**
+     * T025: Modal backdrop
+     * bg-slate-900/50 backdrop-blur-md per design-system.md
+     * Fade animation: 200ms ease-out-cubic
+     */
+    const backdropClasses = cn(
+      'fixed inset-0 z-50',
+      // T025: Backdrop with blur
+      'bg-slate-900/50 backdrop-blur-md',
+      // Fade animation
+      isAnimatingOut
+        ? 'animate-[fadeOut_200ms_ease-in]'
+        : 'animate-[fadeIn_200ms_ease-out]',
+      'transition-all duration-200'
+    );
 
-    const contentAnimationClass = isAnimatingOut
-      ? 'animate-[scaleOut_200ms_ease-in]'
-      : 'animate-[modalEnter_200ms_ease-out]';
+    /**
+     * T026: Modal content styling
+     * rounded-2xl, shadow-xl/2xl, glassmorphism per design-system.md
+     */
+    const contentClasses = cn(
+      'relative z-10 w-full mx-4',
+      // T026: Content styling
+      'bg-white rounded-2xl shadow-xl dark:bg-slate-800 dark:shadow-2xl',
+      // Glassmorphism effect
+      'border border-slate-100 dark:border-slate-700',
+      sizeClasses[size],
+      // T027: Entrance animation - scale 0.95→1, opacity 0→1, 300ms ease-out-cubic
+      isAnimatingOut
+        ? 'animate-[scaleOut_200ms_ease-in]'
+        : 'animate-[scaleIn_300ms_ease-out]'
+    );
 
     return (
       <div
-        className="modal-overlay"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
         aria-modal="true"
         role="dialog"
         aria-labelledby={title ? 'modal-title' : undefined}
       >
-        {/* Modal backdrop with blur */}
+        {/* T025: Modal backdrop with blur */}
         <div
-          className={`modal-overlay ${overlayAnimationClass}`}
+          className={backdropClasses}
           onClick={handleClose}
           aria-hidden="true"
         />
 
-        {/* Modal content with glassmorphism */}
-        <div
-          ref={ref || contentRef}
-          className={`modal-content ${sizeClasses[size]} ${contentAnimationClass}`}
-          role="document"
-        >
+        {/* T026: Modal content with glassmorphism */}
+        <div ref={ref || contentRef} className={contentClasses} role="document">
           {/* Header */}
           {title && (
-            <div className="modal-header">
+            <div className="flex items-center justify-between border-b border-slate-100 px-8 pt-8 pb-4 dark:border-slate-700">
               <h2
                 id="modal-title"
-                className="modal-title"
+                className="text-2xl font-bold text-slate-900 dark:text-slate-50"
               >
                 {title}
               </h2>
@@ -139,7 +159,12 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="modal-close"
+                  className={cn(
+                    'rounded-xl p-2 transition-all duration-300 ease-out-cubic',
+                    'hover:bg-slate-100 dark:hover:bg-slate-700',
+                    'focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
+                    'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
+                  )}
                   aria-label="Close modal"
                 >
                   <svg
@@ -161,11 +186,8 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
             </div>
           )}
 
-          {/* Body */}
-          <div className="modal-body">{children}</div>
-
-          {/* Footer - added for completeness with design system */}
-          <div className="modal-footer hidden"></div>
+          {/* Content */}
+          <div className="px-8 py-6">{children}</div>
         </div>
 
         {/* Add animation keyframes via style for entrance/exit */}

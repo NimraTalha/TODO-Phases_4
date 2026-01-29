@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { UserMenu } from '@/components/ui/UserMenu';
+import { AuthControls } from '@/components/layout/AuthControls';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { Layout, CheckCircle2 } from 'lucide-react';
 
@@ -63,7 +64,9 @@ export default function Header() {
             <div className="flex items-center gap-2 p-1.5 rounded-[1.25rem] bg-muted/30 border border-ui-border/20 shadow-inner">
               <ThemeToggle position="header" />
               <div className="w-px h-5 bg-ui-border/30 mx-1" />
-              <UserMenu />
+
+              {/* Render either UserMenu or Sign In/Up buttons based on authentication state */}
+              <AuthControls />
             </div>
 
             {!pathname?.includes('/dashboard') && (
@@ -73,6 +76,7 @@ export default function Header() {
                 </button>
               </Link>
             )}
+
           </div>
         </div>
       </div>
