@@ -174,7 +174,7 @@ body {
 
 .body {
   font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed;
+  line-height: var(--line-height-relaxed);
   color: hsl(var(--muted-foreground));
 }
 
