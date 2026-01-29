@@ -21,7 +21,7 @@ const outfit = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: 'Todo App - Flagship',
+  title: 'Todo Pro - Flagship',
   description: 'A stunning, professional-grade todo application',
 }
 

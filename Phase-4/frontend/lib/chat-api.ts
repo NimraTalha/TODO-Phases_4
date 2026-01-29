@@ -1,7 +1,7 @@
 import { ChatRequest, ChatResponse } from './types';
 
-// Point to backend server
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001/api';
+// Point to backend server - removing '/api' suffix since it's added in the endpoint
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 class ChatApiClient {
   private baseUrl: string;
@@ -31,7 +31,8 @@ class ChatApiClient {
   }
 
   async sendMessage(userId: string, message: string, conversationId?: string): Promise<ChatResponse> {
-    const url = `${this.baseUrl}/${userId}/chat`;
+    // Fixed endpoint to match backend API structure
+    const url = `${this.baseUrl}/api/${userId}/chat`;
     const headers = this.getHeaders();
     console.log('Chat API Request:', { url, userId, conversationId, headers }); // Enhanced debug log
 

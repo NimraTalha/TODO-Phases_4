@@ -29,6 +29,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   size?: ButtonSize;
   isLoading?: boolean;
   fullWidth?: boolean;
+  asChild?: boolean; // Support asChild prop for composition
   children: React.ReactNode;
 }
 
@@ -48,9 +49,16 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  *   Loading...
  * </Button>
  * ```
+ *
+ * @example with asChild
+ * ```tsx
+ * <Button asChild>
+ *   <Link href="/some-page">Navigate</Link>
+ * </Button>
+ * ```
  */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', isLoading = false, fullWidth = false, children, className, disabled, ...props }, ref) => {
+  ({ variant = 'primary', size = 'md', isLoading = false, fullWidth = false, asChild = false, children, className, disabled, ...props }, ref) => {
     /**
      * Variant-specific classes from design-system.md
      * T016: Button variants (primary, secondary, ghost, danger)
@@ -128,6 +136,26 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       sizeClasses[size],
       className
     );
+
+    // If asChild is true, clone the child element and apply button properties to it
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(
+        children,
+        {
+          ref,
+          className: cn(baseClasses, children.props.className),
+          disabled: disabled || isLoading,
+          'aria-busy': isLoading,
+          ...props
+        } as React.ButtonHTMLAttributes<HTMLElement>,
+        isLoading ? (
+          <span className="flex items-center gap-2">
+            {loadingSpinner}
+            <span>Loading...</span>
+          </span>
+        ) : children.props.children
+      );
+    }
 
     return (
       <button

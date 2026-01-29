@@ -1,27 +1,38 @@
 @import "tailwindcss";
+
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
+
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
+
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
+
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
+
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
+
   --color-ui-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-fade-in-up: fadeInUp 0.5s ease-out forwards;
@@ -30,33 +41,71 @@
   --animate-glow: glow-pulse 2s ease-in-out infinite;
 
   @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
+    from {
+      height: 0;
+    }
+
+    to {
+      height: var(--radix-accordion-content-height);
+    }
   }
 
   @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+
+    to {
+      height: 0;
+    }
   }
 
   @keyframes fadeInUp {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
   }
 
   @keyframes welcome-fade {
-    0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   @keyframes glow-pulse {
-    0%, 100% { box-shadow: 0 0 0 rgba(99, 102, 241, 0); }
-    50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+    }
+
+    50% {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
   }
 
   @keyframes blob {
@@ -193,20 +242,9 @@
     z-index: 0;
   }
 
-  .blob.small {
-    width: 10rem;
-    height: 10rem;
-  }
-
-  .blob.medium {
-    width: 18rem;
-    height: 18rem;
-  }
-
-  .blob.large {
-    width: 28rem;
-    height: 28rem;
-  }
+  .blob.small { width: 10rem; height: 10rem; }
+  .blob.medium { width: 18rem; height: 18rem; }
+  .blob.large { width: 28rem; height: 28rem; }
 
   /* Neon accent for primary buttons */
   .neon {
@@ -329,16 +367,8 @@
     @apply text-xl md:text-2xl font-bold;
   }
 
-  .h4 {
-    @apply text-lg font-semibold;
-  }
-
   .body {
-    @apply text-base text-muted-foreground leading-relaxed;
-  }
-
-  .caption {
-    @apply text-sm text-muted-foreground;
+    @apply text-lg text-muted-foreground leading-relaxed;
   }
 }
 

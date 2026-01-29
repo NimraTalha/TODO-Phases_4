@@ -19,7 +19,7 @@
     "jwt",
     "react"
   ],
-  "author": "Your Name",
+  "author": "Todo App Development Team",
   "license": "MIT",
   "type": "module",
   "dependencies": {

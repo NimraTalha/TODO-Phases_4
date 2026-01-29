@@ -29,19 +29,30 @@ export const useChat = () => {
     // Get user ID from token or storage
     const token = localStorage.getItem('token');
     if (!token) {
-      throw new Error('User not authenticated');
+      throw new Error('Please log in to use the chat feature');
     }
 
     // Extract user ID from JWT token
     let userId = '';
     try {
-      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      // Validate token format first
+      if (!token.includes('.')) {
+        throw new Error('Invalid token format: Token must be a valid JWT');
+      }
+
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        throw new Error('Invalid token format: JWT must have 3 parts');
+      }
+
+      const tokenPayload = JSON.parse(atob(tokenParts[1]));
       userId = tokenPayload.userId || tokenPayload.sub;
       if (!userId) {
         throw new Error('User ID not found in token');
       }
     } catch (error) {
-      throw new Error('Invalid token format');
+      console.error('Token parsing error:', error);
+      throw new Error('Authentication required: Invalid session');
     }
 
     // Add user message to chat
@@ -119,20 +130,27 @@ export const useChat = () => {
     // Get user ID from token or storage
     const token = localStorage.getItem('token');
     if (!token) {
-      throw new Error('User not authenticated');
+      throw new Error('Please log in to use the chat feature');
     }
 
     try {
       // Extract user ID from JWT token
       let userId = '';
-      try {
-        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-        userId = tokenPayload.userId || tokenPayload.sub;
-        if (!userId) {
-          throw new Error('User ID not found in token');
-        }
-      } catch (error) {
-        throw new Error('Invalid token format');
+
+      // Validate token format first
+      if (!token.includes('.')) {
+        throw new Error('Invalid token format: Token must be a valid JWT');
+      }
+
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        throw new Error('Invalid token format: JWT must have 3 parts');
+      }
+
+      const tokenPayload = JSON.parse(atob(tokenParts[1]));
+      userId = tokenPayload.userId || tokenPayload.sub;
+      if (!userId) {
+        throw new Error('User ID not found in token');
       }
 
       // In a real implementation, we would call the API to get conversation history

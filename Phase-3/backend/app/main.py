@@ -6,25 +6,22 @@ from .core.config import settings
 from .api import tasks, auth
 from .api.routes import chat
 
-from contextlib import asynccontextmanager
-from .db import create_db_and_tables, get_async_session
+from .db import get_async_session
 from fastapi import Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .models import user, task # Import models to register them with SQLModel
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await create_db_and_tables()
-    yield
+app = FastAPI(title=settings.PROJECT_NAME)
 
-app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
-
+# Configure CORS - allowing all origins for now (restrict in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http?://(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?",
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Allow credentials to be sent with cross-origin requests
+    allow_origin_regex=".*",  # Allow any origin
 )
 
 @app.middleware("http")
@@ -65,3 +62,6 @@ async def test_db(db: AsyncSession = Depends(get_async_session)):
         return {"status": "ok", "db": "connected"}
     except Exception as e:
         return {"status": "error", "db": str(e)}
+
+# For Railway deployment, we don't need the Mangum handler
+# Just the standard FastAPI app

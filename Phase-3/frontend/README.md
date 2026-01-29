@@ -1,4 +1,4 @@
-# Todo App - Frontend
+# Todo App - Phase II Frontend
 
 A stunning, professional-grade todo application built with Next.js 16+, TypeScript, and Tailwind CSS. This application provides a breathtaking user experience with top-tier visual design comparable to Todoist, Notion, or Linear.
 
