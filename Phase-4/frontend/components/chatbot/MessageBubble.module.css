@@ -21,7 +21,7 @@
 
 .assistant .content {
   background: linear-gradient(135deg, #f7f7dc, #e6e6c8); /* olive green gradient */
-  color: #554236; /* dark olive text */
+  color: #333333; /* dark gray text for better readability */
   border-radius: 4px 18px 18px 18px;
 }
 
@@ -63,7 +63,7 @@
 
 [data-theme='dark'] .assistant .content {
   background: linear-gradient(135deg, #787850, #505030); /* dark olive gradient */
-  color: #e0cfa9; /* light olive text */
+  color: #ffffff; /* white text for better readability in dark mode */
 }
 
 [data-theme='dark'] .system .content {
