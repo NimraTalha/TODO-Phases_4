@@ -1,0 +1,61 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import traceback
+import asyncio
+from fastapi.middleware.cors import CORSMiddleware
+from .core.config import settings
+from .api import tasks, auth
+
+from contextlib import asynccontextmanager
+from .db import create_db_and_tables
+from .models import user, task  # Import models to register them with SQLModel
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting up...")
+    try:
+        await create_db_and_tables()
+        print("Database tables created successfully")
+    except Exception as e:
+        print(f"Error during startup: {e}")
+        traceback.print_exc()
+        # Don't raise the exception here to allow the app to start
+    yield
+    print("Shutting down...")
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    lifespan=lifespan,
+    debug=True  # Set to False in production
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://*.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    # Log full traceback to server stdout for debugging
+    print(f"Global exception: {exc}")
+    traceback.print_exception(type(exc), exc, exc.__traceback__)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred."},
+    )
+
+@app.get("/")
+async def root():
+    return {"message": "Backend API is running!", "project": settings.PROJECT_NAME}
+
+app.include_router(auth.router, prefix="/api")
+app.include_router(tasks.router, prefix="/api/tasks")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "project": settings.PROJECT_NAME, "database_url_set": bool(settings.DATABASE_URL)}
+
+# Routers will be registered here in Phase 3

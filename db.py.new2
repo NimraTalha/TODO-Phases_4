@@ -1,0 +1,71 @@
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
+from sqlmodel.ext.asyncio.session import AsyncSession
+from .core.config import settings
+
+from urllib.parse import urlparse
+import os
+
+# Debug: Print the database URL (but mask sensitive parts)
+if settings.DATABASE_URL:
+    parsed_url = urlparse(settings.DATABASE_URL)
+    masked_url = f"{parsed_url.scheme}://{parsed_url.hostname}:****@{parsed_url.hostname}{parsed_url.path}"
+    print(f"Connecting to database: {masked_url}")
+else:
+    print("DATABASE_URL is not set!")
+
+# asyncpg uses 'postgresql+asyncpg://'
+database_url = settings.DATABASE_URL
+if database_url and database_url.startswith("postgresql://"):
+    database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+elif not database_url:
+    # Fallback for testing purposes only
+    database_url = os.getenv("DATABASE_URL", "")
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+# Parse the database URL to determine if SSL is needed
+connect_args = {}
+if database_url:
+    parsed = urlparse(database_url)
+    hostname = parsed.hostname or ""
+    
+    if hostname not in ("localhost", "127.0.0.1", "0.0.0.0", ""):
+        connect_args = {"ssl": "prefer"}  # Use "prefer" instead of "require" for broader compatibility
+    else:
+        # For local development, don't require SSL
+        connect_args = {}
+
+print(f"Database connection args: {connect_args}")
+
+engine = create_async_engine(
+    database_url,
+    echo=True,  # Set to False in production
+    future=True,
+    connect_args=connect_args,
+    pool_pre_ping=True,  # Check connection liveness before using
+    pool_recycle=300,    # Recycle connections every 5 minutes
+    pool_size=5,         # Reduced pool size for Railway
+    max_overflow=10      # Allow overflow
+)
+
+from sqlmodel import SQLModel
+
+async def get_async_session() -> AsyncSession:
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
+        yield session
+
+async def create_db_and_tables():
+    try:
+        print("Attempting to create database tables...")
+        async with engine.begin() as conn:
+            await conn.run_sync(SQLModel.metadata.create_all)
+        print("Database tables created successfully")
+    except Exception as e:
+        print(f"Error creating database tables: {e}")
+        import traceback
+        traceback.print_exc()
+        # Don't raise the exception to allow the app to start

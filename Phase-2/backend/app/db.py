@@ -5,30 +5,36 @@ from .core.config import settings
 
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
-# Neon requires sslmode=require for secure connections
-# asyncpg uses 'postgresql+asyncpg://'
+# Handle different database types appropriately
 database_url = settings.DATABASE_URL
-if database_url.startswith("postgresql://"):
-    database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-# Clean up query params for asyncpg
-parsed = urlparse(database_url)
-qs = parse_qs(parsed.query)
+# If it's a SQLite URL, use it as-is
+if database_url.startswith("sqlite"):
+    # For SQLite, no transformation needed
+    connect_args = {}
+else:
+    # For PostgreSQL URLs, apply the transformations
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-# Remove unsupported keys
-for key in ["sslmode", "channel_binding", "options"]:
-    qs.pop(key, None)
+    # Clean up query params for asyncpg
+    parsed = urlparse(database_url)
+    qs = parse_qs(parsed.query)
 
-# Rebuild URL without forcing ssl query params; we'll pass SSL via connect_args
-new_query = urlencode(qs, doseq=True)
-database_url = urlunparse(parsed._replace(query=new_query))
+    # Remove unsupported keys
+    for key in ["sslmode", "channel_binding", "options"]:
+        qs.pop(key, None)
 
-# Determine connect args: enable SSL for non-local hosts (e.g., Neon)
-connect_args = {}
-hostname = parsed.hostname or ""
-if hostname not in ("localhost", "127.0.0.1", ""):
-    # asyncpg expects `ssl` argument (True or SSLContext) instead of sslmode
-    connect_args = {"ssl": True}
+    # Rebuild URL without forcing ssl query params; we'll pass SSL via connect_args
+    new_query = urlencode(qs, doseq=True)
+    database_url = urlunparse(parsed._replace(query=new_query))
+
+    # Determine connect args: enable SSL for non-local hosts (e.g., Neon)
+    connect_args = {}
+    hostname = parsed.hostname or ""
+    if hostname not in ("localhost", "127.0.0.1", ""):
+        # asyncpg expects `ssl` argument (True or SSLContext) instead of sslmode
+        connect_args = {"ssl": True}
 
 engine = create_async_engine(
     database_url,
