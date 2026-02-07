@@ -26,17 +26,35 @@ app.add_middleware(
 
 ### Step 2: Deploy Backend to Railway (Recommended)
 
-1. Go to [railway.app](https://railway.app) and sign up with your GitHub account
-2. Click "New Project" → "Deploy from GitHub repo"
-3. Select your repository containing the backend code
-4. Railway will automatically detect it's a Python project
-5. Go to "Settings" → "Environment Variables" and add:
-   - `DATABASE_URL`: Click "Generate" to create a free PostgreSQL database
-   - `BETTER_AUTH_SECRET`: Create a strong random secret (e.g., use a password generator)
-   - `BETTER_AUTH_URL`: Your frontend URL (e.g., https://your-frontend.vercel.app)
-   - `COHERE_API_KEY`: If you're using AI features (optional)
-6. Go to "Deployments" tab and click "Redeploy"
-7. Once complete, you'll get a URL like `https://your-project-name.up.railway.app`
+**Important**: Your current repository contains multiple project phases in the root directory. Railway is analyzing the root directory instead of the backend directory, which is causing the build failure.
+
+You need to create a separate repository for the backend:
+
+1. Create a new directory called `todo-backend`
+2. Copy only the contents of the `Phase-2/backend/` directory to this new directory
+3. Initialize a new git repository in this directory:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial backend commit"
+   ```
+4. Create a new GitHub repository named `todo-backend`
+5. Add the remote and push:
+   ```bash
+   git remote add origin https://github.com/yourusername/todo-backend.git
+   git push -u origin main
+   ```
+6. Go to [railway.app](https://railway.app) and sign up with your GitHub account
+7. Click "New Project" → "Deploy from GitHub repo"
+8. Select your new `todo-backend` repository
+9. Railway will automatically detect it's a Python project
+10. Go to "Settings" → "Environment Variables" and add:
+    - `DATABASE_URL`: Click "Generate" to create a free PostgreSQL database
+    - `BETTER_AUTH_SECRET`: Create a strong random secret (e.g., use a password generator)
+    - `BETTER_AUTH_URL`: Your frontend URL (e.g., https://your-frontend.vercel.app)
+    - `COHERE_API_KEY`: If you're using AI features (optional)
+11. Go to "Deployments" tab and click "Redeploy"
+12. Once complete, you'll get a URL like `https://your-project-name.up.railway.app`
 
 ### Alternative: Deploy Backend to Render
 
