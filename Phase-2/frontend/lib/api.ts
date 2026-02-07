@@ -81,6 +81,12 @@ class ApiClient {
       return JSON.parse(text) as T;
     } catch (error) {
       console.error(`API request error for ${url}:`, error);
+      
+      // Provide a more user-friendly error message for network issues
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Unable to connect to the server. Please check your connection and try again.');
+      }
+      
       throw error;
     }
   }
@@ -96,63 +102,85 @@ class ApiClient {
 
   // Auth methods
   async signIn(email: string, password: string): Promise<{ user: any; token: string }> {
-    const response = await fetch(`${this.baseUrl}/auth/sign-in`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/sign-in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || errorData.message || 'Sign in failed');
-    }
-
-    const data = await response.json();
-
-    // Store token and user name in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', data.token);
-      if (data.user?.full_name) {
-        localStorage.setItem('user_name', data.user.full_name);
-      } else if (data.user?.name) {
-        localStorage.setItem('user_name', data.user.name);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || errorData.message || 'Sign in failed');
       }
-    }
 
-    return data;
+      const data = await response.json();
+
+      // Store token and user name in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', data.token);
+        if (data.user?.full_name) {
+          localStorage.setItem('user_name', data.user.full_name);
+        } else if (data.user?.name) {
+          localStorage.setItem('user_name', data.user.name);
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Sign in error:', error);
+      
+      // Provide a more user-friendly error message for network issues
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Unable to connect to the authentication server. Please check your connection and try again.');
+      }
+      
+      throw error;
+    }
   }
 
   async signUp(email: string, password: string, name: string): Promise<{ user: any; token: string }> {
-    const response = await fetch(`${this.baseUrl}/auth/sign-up`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, name }),
-    });
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/sign-up`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || errorData.message || 'Sign up failed');
-    }
-
-    const data = await response.json();
-
-    // Store token and user name in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', data.token);
-      if (data.user?.full_name) {
-        localStorage.setItem('user_name', data.user.full_name);
-      } else if (data.user?.name) {
-        localStorage.setItem('user_name', data.user.name);
-      } else if (name) {
-        localStorage.setItem('user_name', name);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || errorData.message || 'Sign up failed');
       }
-    }
 
-    return data;
+      const data = await response.json();
+
+      // Store token and user name in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', data.token);
+        if (data.user?.full_name) {
+          localStorage.setItem('user_name', data.user.full_name);
+        } else if (data.user?.name) {
+          localStorage.setItem('user_name', data.user.name);
+        } else if (name) {
+          localStorage.setItem('user_name', name);
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Sign up error:', error);
+      
+      // Provide a more user-friendly error message for network issues
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Unable to connect to the authentication server. Please check your connection and try again.');
+      }
+      
+      throw error;
+    }
   }
 
   async signOut(): Promise<void> {

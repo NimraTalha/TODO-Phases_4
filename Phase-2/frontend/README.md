@@ -57,6 +57,31 @@ NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:8000
 BETTER_AUTH_SECRET=your-secret-key
 ```
 
+For Vercel deployment, make sure to set these environment variables in your Vercel dashboard:
+- `NEXT_PUBLIC_API_URL`: Your deployed backend API URL (e.g., `https://your-backend-app.vercel.app/api`)
+- `NEXT_PUBLIC_BETTER_AUTH_URL`: Your deployed frontend URL
+- `BETTER_AUTH_SECRET`: A secure secret key for authentication
+
+## Deployment to Vercel
+
+1. Push your code to a GitHub repository
+2. Connect your repository to Vercel
+3. Add the required environment variables in the Vercel dashboard
+4. Deploy!
+
+### Common Deployment Issues
+
+#### "Failed to fetch" Error
+This error typically occurs when:
+- The backend API URL is incorrect
+- The backend service is not running or not accessible
+- CORS policies are blocking the request
+
+To fix:
+1. Verify your `NEXT_PUBLIC_API_URL` is correctly set to your deployed backend
+2. Ensure your backend API is deployed and accessible
+3. Check that your backend allows requests from your frontend origin
+
 ## Why This UI Feels Premium
 
 - **Visual Hierarchy**: Carefully crafted spacing and typography create clear information architecture
