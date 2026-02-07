@@ -10,5 +10,6 @@ class Settings(BaseSettings):
     BETTER_AUTH_SECRET: str = "dev-secret"
     BETTER_AUTH_URL: str = "http://localhost:3000"
     DATABASE_URL: str
+    COHERE_API_KEY: str = ""  # Optional - leave empty if not using AI features
 
 settings = Settings()

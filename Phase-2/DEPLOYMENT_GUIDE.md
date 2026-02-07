@@ -8,27 +8,7 @@ This guide explains how to properly deploy both the frontend and backend of the 
 
 ### Step 1: Prepare the Backend for Deployment
 
-1. Create a new file `backend/app/core/config.py` (if not already present) with proper environment variable handling:
-
-```python
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
-import os
-
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
-    )
-
-    PROJECT_NAME: str = "Todo API"
-    BETTER_AUTH_SECRET: str = os.getenv("BETTER_AUTH_SECRET", "dev-secret")
-    BETTER_AUTH_URL: str = os.getenv("BETTER_AUTH_URL", "http://localhost:3000")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
-
-settings = Settings()
-```
-
-2. Update the CORS middleware in `backend/app/main.py` to allow Vercel domains:
+1. Update the CORS middleware in `backend/app/main.py` to allow Vercel domains:
 
 ```python
 app.add_middleware(
@@ -40,23 +20,41 @@ app.add_middleware(
 )
 ```
 
-### Step 2: Deploy Backend to Vercel
+2. We've added the following files to help with deployment:
+   - `runtime.txt` - Specifies Python version
+   - `Procfile` - Defines the startup command
 
-1. Create a new GitHub repository for the backend
-2. Push your backend code to the repository
-3. Go to [Vercel](https://vercel.com/) and create a new project
-4. Import your backend repository
-5. Configure the build settings:
-   - Framework Preset: None
-   - Build Command: `cd backend && pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - Output Directory: Leave blank
-   - Install Command: `cd backend && pip install -r requirements.txt`
-6. Add the following environment variables:
-   - `DATABASE_URL`: Your PostgreSQL database URL
-   - `BETTER_AUTH_SECRET`: A strong secret key for authentication
+### Step 2: Deploy Backend to Railway (Recommended)
+
+1. Go to [railway.app](https://railway.app) and sign up with your GitHub account
+2. Click "New Project" → "Deploy from GitHub repo"
+3. Select your repository containing the backend code
+4. Railway will automatically detect it's a Python project
+5. Go to "Settings" → "Environment Variables" and add:
+   - `DATABASE_URL`: Click "Generate" to create a free PostgreSQL database
+   - `BETTER_AUTH_SECRET`: Create a strong random secret (e.g., use a password generator)
    - `BETTER_AUTH_URL`: Your frontend URL (e.g., https://your-frontend.vercel.app)
-7. Deploy the project
-8. Note the deployment URL (e.g., `https://your-backend-app.vercel.app`)
+   - `COHERE_API_KEY`: If you're using AI features (optional)
+6. Go to "Deployments" tab and click "Redeploy"
+7. Once complete, you'll get a URL like `https://your-project-name.up.railway.app`
+
+### Alternative: Deploy Backend to Render
+
+1. Go to [render.com](https://render.com) and sign up
+2. Click "New +" → "Web Service" → "Connect your Git repository"
+3. Select your repository containing the backend code
+4. Configure the build:
+   - Environment: Python
+   - Runtime: python-3.11 (or latest)
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+5. Add environment variables:
+   - `DATABASE_URL`: Create a free PostgreSQL database through Render
+   - `BETTER_AUTH_SECRET`: A strong random secret
+   - `BETTER_AUTH_URL`: Your frontend URL
+   - `COHERE_API_KEY`: If you're using AI features (optional)
+6. Click "Create Web Service"
+7. Once deployed, you'll get a URL like `https://your-app.onrender.com`
 
 ## Frontend Deployment
 
