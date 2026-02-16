@@ -14,7 +14,6 @@ class ChatbotService:
 
     def __init__(self):
         """Initialize the chatbot service with Cohere client and tools."""
-        """Initialize the chatbot service with Cohere client and tools."""
         from app.core.config import settings
         api_key = settings.COHERE_API_KEY
         

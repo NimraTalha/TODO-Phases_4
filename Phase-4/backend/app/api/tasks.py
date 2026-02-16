@@ -4,12 +4,6 @@ from typing import List, Optional
 from ..models.task import Task, TaskCreate, TaskUpdate
 from .deps import SessionDep, CurrentUserDep
 
-from fastapi import APIRouter, HTTPException, Query, status
-from sqlmodel import select
-from typing import List, Optional
-from ..models.task import Task, TaskCreate, TaskUpdate
-from .deps import SessionDep, CurrentUserDep
-
 router = APIRouter()
 
 @router.get("/", response_model=List[Task])
